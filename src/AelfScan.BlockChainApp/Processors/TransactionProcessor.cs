@@ -22,10 +22,10 @@ public class TransactionProcessor : TransactionProcessorBase
             }
         },
         {
-            "tDVW", new List<string>()
+            "tDVV", new List<string>()
             {
-                "2KPUA5wG78nnNmK9JsRWbFiEFUEfei9WKniZuKaVziDKZRwchM",
-                "ASh2Wt7nSEmYqnGxPPzp4pnVDU4uhj1XW9Se5VeZcX2UDdyjx"
+                "7RzVGiuVWkvL4VfVHdZfQF2Tri3sgLe9U991bohHFfSRZXuGX",
+                "BNPFPPwQ3DE9rwxzdY61Q2utU9FZx9KYUnrYHQqCR6N4LLhUE"
             }
         }
     };
