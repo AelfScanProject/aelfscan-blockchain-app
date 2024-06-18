@@ -1,5 +1,6 @@
 using AeFinder.Block.Dtos;
 using AeFinder.Sdk.Processor;
+using AElfScan.BlockChainApp.Entities;
 using AElfScan.BlockChainApp.GraphQL;
 using NSubstitute.Core;
 using Shouldly;
@@ -44,8 +45,8 @@ public class TransactionProcessorTests : TokenContractAppTestBase
             From = "testFrom3",
             To = "to3"
         };
-        
-        
+
+
         var transactionContext1 = GenerateTransactionContext(transaction1);
         transactionContext1.Block.BlockHeight = 1;
         transactionContext1.Block.BlockTime = DateTime.Today.AddDays(-2);
@@ -54,7 +55,7 @@ public class TransactionProcessorTests : TokenContractAppTestBase
         var transactionContext2 = GenerateTransactionContext(transaction2);
         transactionContext2.Block.BlockHeight = 250001;
         transactionContext2.Block.BlockTime = DateTime.Today;
-        
+
         var transactionContext3 = GenerateTransactionContext(transaction3);
         transactionContext3.Block.BlockHeight = 250002;
         transactionContext3.Block.BlockTime = DateTime.Today;
@@ -62,13 +63,24 @@ public class TransactionProcessorTests : TokenContractAppTestBase
         await _transactionProcessor.ProcessAsync(transaction1, transactionContext1);
         await SaveDataAsync();
 
+
+        var result = Query.AddressTransactionCount(AddressTransactionCountRepository, ObjectMapper,
+            new GetAddressTransactionCountInput()
+            {
+                ChainId = "AELF",
+                AddressList = new List<string>() { "testFrom1" }
+            });
+        
+        
+            
         var transactionResult = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
-            TransactionCountInfoReadOnlyRepository, ObjectMapper,
+            TransactionCountInfoReadOnlyRepository, AddressTransactionCountRepository, ObjectMapper,
             new GetTransactionInfosInput()
             {
                 ChainId = "AELF",
                 SkipCount = 0,
                 MaxResultCount = 2,
+                Address = "testFrom1"
             });
 
         transactionResult.Items.Count.ShouldBe(1);
@@ -79,7 +91,7 @@ public class TransactionProcessorTests : TokenContractAppTestBase
 
 
         var transactionResult2 = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
-            TransactionCountInfoReadOnlyRepository, ObjectMapper,
+            TransactionCountInfoReadOnlyRepository,AddressTransactionCountRepository, ObjectMapper,
             new GetTransactionInfosInput()
             {
                 ChainId = "AELF",
@@ -94,9 +106,9 @@ public class TransactionProcessorTests : TokenContractAppTestBase
         await _transactionProcessor.ProcessAsync(transaction3, transactionContext3);
         await SaveDataAsync();
 
-        
+
         var transactionResult3 = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
-            TransactionCountInfoReadOnlyRepository, ObjectMapper,
+            TransactionCountInfoReadOnlyRepository,AddressTransactionCountRepository, ObjectMapper,
             new GetTransactionInfosInput()
             {
                 ChainId = "AELF",

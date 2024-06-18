@@ -28,8 +28,9 @@ public abstract class TokenContractAppTestBase : AElfScanBlockChainAppOrleansTes
     protected readonly IssuedProcessor IssuedProcessor;
     protected readonly IObjectMapper ObjectMapper;
 
-    protected readonly IReadOnlyRepository<Entities.TransactionInfo> TransactionInfoReadOnlyRepository;
-    protected readonly IReadOnlyRepository<Entities.TransactionCountInfo> TransactionCountInfoReadOnlyRepository;
+    protected readonly IReadOnlyRepository<TransactionInfo> TransactionInfoReadOnlyRepository;
+    protected readonly IReadOnlyRepository<TransactionCountInfo> TransactionCountInfoReadOnlyRepository;
+    protected readonly IReadOnlyRepository<AddressTransactionCountInfo> AddressTransactionCountRepository;
 
     protected Address TestAddress = Address.FromBase58("ooCSxQ7zPw1d4rhQPBqGKB6myvuWbicCiw3jdcoWEMMpa54ea");
     protected string ChainId = "AELF";
@@ -48,7 +49,7 @@ public abstract class TokenContractAppTestBase : AElfScanBlockChainAppOrleansTes
         IssuedProcessor = GetRequiredService<IssuedProcessor>();
         ObjectMapper = GetRequiredService<IObjectMapper>();
 
-
+        AddressTransactionCountRepository = GetRequiredService<IReadOnlyRepository<AddressTransactionCountInfo>>();
         TransactionInfoReadOnlyRepository = GetRequiredService<IReadOnlyRepository<TransactionInfo>>();
         TransactionCountInfoReadOnlyRepository = GetRequiredService<IReadOnlyRepository<TransactionCountInfo>>();
 
@@ -73,7 +74,7 @@ public abstract class TokenContractAppTestBase : AElfScanBlockChainAppOrleansTes
 
         _operationLimitManager.ResetAll();
         _blockProcessingContext.SetContext(ChainId, BlockHash, BlockHeight,
-            DateTime.UtcNow, false);
+            DateTime.UtcNow);
     }
 
     protected LogEventContext GenerateLogEventContext<T>(T eventData) where T : IEvent<T>

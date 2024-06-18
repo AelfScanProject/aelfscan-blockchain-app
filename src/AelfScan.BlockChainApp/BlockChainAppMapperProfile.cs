@@ -19,5 +19,6 @@ public class BlockChainAppMapperProfile : Profile
 
         CreateMap<Transaction, TransactionInfo>();
         CreateMap<TransactionInfo, TransactionInfoDto>();
+        CreateMap<AddressTransactionCountInfo, AddressTransactionCountDto>();
     }
 }

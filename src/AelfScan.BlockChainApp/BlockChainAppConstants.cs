@@ -5,7 +5,7 @@ public class BlockChainAppConstants
     public static Dictionary<string, string> ContractAddresses = new()
     {
         { "AELF", "JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE" },
-        { "tDVV", "7RzVGiuVWkvL4VfVHdZfQF2Tri3sgLe9U991bohHFfSRZXuGX" }
+        { "tDVW", "ASh2Wt7nSEmYqnGxPPzp4pnVDU4uhj1XW9Se5VeZcX2UDdyjx" }
     };
     
     public static Dictionary<string,long> InitialBalanceEndHeight = new Dictionary<string, long>

@@ -8,7 +8,6 @@ public class IssuedProcessor : TokenProcessorBase<Issued>
 {
     public override async Task ProcessAsync(Issued logEvent, LogEventContext context)
     {
-        if (logEvent.Symbol != "ELF")
         {
             return;
         }
