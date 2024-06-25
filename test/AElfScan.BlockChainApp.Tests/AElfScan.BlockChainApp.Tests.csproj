@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>AElfScan.BlockChainApp</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\AElfScan.BlockChainApp\AElfScan.BlockChainApp.csproj" />
+      <ProjectReference Include="..\AElfScan.BlockChainApp.Orleans.TestBase\AElfScan.BlockChainApp.Orleans.TestBase.csproj" />
+      <ProjectReference Include="..\AElfScan.BlockChainApp.TestBase\AElfScan.BlockChainApp.TestBase.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AeFinder.App" Version="0.0.5" />
+      <PackageReference Include="AutoMapper" Version="12.0.0" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+      <PackageReference Include="coverlet.collector" Version="3.2.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Shouldly" Version="4.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="GraphQL\" />
+    </ItemGroup>
+</Project>
