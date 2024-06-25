@@ -12,7 +12,7 @@ public class ResourceTokenClaimedProcessor : TokenProcessorBase<ResourceTokenCla
         {
             return;
         }
-        if (BlockChainAppConstants.StartProcessBalanceEventHeight[context.ChainId] > context.Block.BlockHeight)
+        if (BlockChainAppConstants.TransactionBeginHeight[context.ChainId] > context.Block.BlockHeight)
         {
             return;
         }

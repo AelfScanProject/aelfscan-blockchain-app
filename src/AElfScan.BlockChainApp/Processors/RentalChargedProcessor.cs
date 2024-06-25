@@ -12,7 +12,7 @@ public class RentalChargedProcessor : TokenProcessorBase<RentalCharged>
         {
             return;
         }
-        if (BlockChainAppConstants.StartProcessBalanceEventHeight[context.ChainId] > context.Block.BlockHeight)
+        if (BlockChainAppConstants.TransactionBeginHeight[context.ChainId] > context.Block.BlockHeight)
         {
             return;
         }

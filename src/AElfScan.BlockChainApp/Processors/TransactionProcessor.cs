@@ -21,7 +21,7 @@ public class TransactionProcessor : TransactionProcessorBase
         await HandlerAddressTransactionCountInfoAsync(context.ChainId, transaction.To);
         string address = IsContractAddress(context.ChainId, transaction.From) ? transaction.From : 
             IsContractAddress(context.ChainId, transaction.To) ? transaction.To : null;
-        if (address == null || BlockChainAppConstants.StartProcessBalanceEventHeight[context.ChainId] <= context.Block.BlockHeight)
+        if (address == null || BlockChainAppConstants.TransactionBeginHeight[context.ChainId] <= context.Block.BlockHeight)
         {
             var transactionInfo = ObjectMapper.Map<Transaction, TransactionInfo>(transaction);
             transactionInfo.BlockHeight = context.Block.BlockHeight;
@@ -45,7 +45,7 @@ public class TransactionProcessor : TransactionProcessorBase
         }
 
         var deleteBlockHeight = blockHeight - BlockHeightDifference;
-        if (deleteBlockHeight <= BlockChainAppConstants.StartProcessBalanceEventHeight[chainId])
+        if (deleteBlockHeight <= BlockChainAppConstants.TransactionBeginHeight[chainId])
         {
             return;
         }
@@ -133,7 +133,7 @@ public class TransactionProcessor : TransactionProcessorBase
             return;
         }
 
-        if (BlockChainAppConstants.StartProcessBalanceEventHeight[chainId] > blockHeight)
+        if (BlockChainAppConstants.TransactionBeginHeight[chainId] > blockHeight)
         {
             return;
         }

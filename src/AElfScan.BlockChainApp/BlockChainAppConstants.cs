@@ -7,15 +7,10 @@ public class BlockChainAppConstants
         { "AELF", "JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE" },
         { "tDVV", "7RzVGiuVWkvL4VfVHdZfQF2Tri3sgLe9U991bohHFfSRZXuGX" }
     };
-    public static Dictionary<string,long> InitialBalanceEndHeight = new Dictionary<string, long>
+    public static Dictionary<string,long> TransactionBeginHeight = new Dictionary<string, long>
     {
-        { "AELF", 4100 },
-        { "tDVV", 5500 }
-    };
-    public static Dictionary<string,long> StartProcessBalanceEventHeight = new Dictionary<string, long>
-    {
-        { "AELF", 193837741 },
-        { "tDVV", 182214194 }
+        { "AELF", 217634830 },
+        { "tDVV", 205591099 }
     };
     
     public static readonly Dictionary<string, List<string>> TransactionAddressListMap = new()
@@ -36,13 +31,4 @@ public class BlockChainAppConstants
         }
     };
     
-    public static  Dictionary<string, long> TransactionBeginHeight = new()
-    {
-        {
-            "AELF", 217634830
-        },
-        {
-            "tDVV", 205591099
-        }
-    };
 }

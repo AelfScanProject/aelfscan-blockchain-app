@@ -13,7 +13,7 @@ public class TransferredProcessor : TokenProcessorBase<Transferred>
         {
             return;
         }
-        if (BlockChainAppConstants.StartProcessBalanceEventHeight[context.ChainId] > context.Block.BlockHeight)
+        if (BlockChainAppConstants.TransactionBeginHeight[context.ChainId] > context.Block.BlockHeight)
         {
             return;
         }
