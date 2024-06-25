@@ -16,8 +16,6 @@ public class TransactionProcessor : TransactionProcessorBase
 
     public override async Task ProcessAsync(Transaction transaction, TransactionContext context)
     {
-        Logger.LogInformation($"start processor transaction data:{context.Block.BlockHeight}");
-       
         await HandlerTransactionCountInfoAsync(context.ChainId);
         await HandlerAddressTransactionCountInfoAsync(context.ChainId, transaction.From);
         await HandlerAddressTransactionCountInfoAsync(context.ChainId, transaction.To);
@@ -104,7 +102,6 @@ public class TransactionProcessor : TransactionProcessorBase
         }
 
         var id = IdGenerateHelper.GetId(chainId, address);
-        Logger.LogInformation("get  AddressTransactionCountInfo id:{c}", id);
 
         var transactionCountInfo =
             await GetEntityAsync<AddressTransactionCountInfo>(id);
@@ -123,9 +120,6 @@ public class TransactionProcessor : TransactionProcessorBase
                 Address = address
             };
         }
-
-        Logger.LogInformation($"Address:{address} transaction count incr to:{transactionCountInfo.Count}");
-
         await SaveEntityAsync(transactionCountInfo);
     }
 
