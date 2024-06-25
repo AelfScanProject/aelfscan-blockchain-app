@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\AElfScan.BlockChainApp\AElfScan.BlockChainApp.csproj" />
+      <ProjectReference Include="..\..\src\AElfScan.BlockChainApp\AElfScan.BlockChainApp.csproj" />
       <ProjectReference Include="..\AElfScan.BlockChainApp.Orleans.TestBase\AElfScan.BlockChainApp.Orleans.TestBase.csproj" />
       <ProjectReference Include="..\AElfScan.BlockChainApp.TestBase\AElfScan.BlockChainApp.TestBase.csproj" />
     </ItemGroup>
