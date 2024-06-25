@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AElfScan.BlockChainApp.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AElfScan.BlockChainApp.Orleans.TestBase", "test\AElfScan.BlockChainApp.Orleans.TestBase\AElfScan.BlockChainApp.Orleans.TestBase.csproj", "{773ADBAC-D170-4D55-B6FF-7FF0BD57D792}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AElfScan.BlockChainApp", "src\AElfScan.BlockChainApp\AElfScan.BlockChainApp.csproj", "{A430E27B-5019-4C89-B1BE-F704ADB88315}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{773ADBAC-D170-4D55-B6FF-7FF0BD57D792}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{773ADBAC-D170-4D55-B6FF-7FF0BD57D792}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{773ADBAC-D170-4D55-B6FF-7FF0BD57D792}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A430E27B-5019-4C89-B1BE-F704ADB88315}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A430E27B-5019-4C89-B1BE-F704ADB88315}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A430E27B-5019-4C89-B1BE-F704ADB88315}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A430E27B-5019-4C89-B1BE-F704ADB88315}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -39,6 +45,7 @@ Global
 		{5364D7A5-020F-4D40-83C4-34F5C279DB0D} = {A9014BDC-B7BE-4290-91BF-D70E329C6E73}
 		{4BA57C7A-423B-4D16-BDC9-2D0BF2A69DC1} = {A9014BDC-B7BE-4290-91BF-D70E329C6E73}
 		{773ADBAC-D170-4D55-B6FF-7FF0BD57D792} = {A9014BDC-B7BE-4290-91BF-D70E329C6E73}
+		{A430E27B-5019-4C89-B1BE-F704ADB88315} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28315BFD-90E7-4E14-A2EA-F3D23AF4126F}

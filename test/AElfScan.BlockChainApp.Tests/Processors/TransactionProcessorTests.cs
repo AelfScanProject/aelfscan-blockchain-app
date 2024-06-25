@@ -99,7 +99,7 @@ public class TransactionProcessorTests : TokenContractAppTestBase
                 MaxResultCount = 2,
             });
 
-        transactionResult2.Items.Count.ShouldBe(1);
+        transactionResult2.Items.Count.ShouldBe(2);
         transactionResult2.TotalCount.ShouldBe(2);
 
 
