@@ -40,6 +40,7 @@ public class AElfScanBlockChainAppTestModule : AbpModule
         context.Services.AddSingleton<RentalChargedProcessor>();
         context.Services.AddSingleton<ResourceTokenClaimedProcessor>();
         context.Services.AddSingleton<TransferredProcessor>();
+        context.Services.AddSingleton<TransactionProcessor>();
 
 
         context.Services.Configure<ChainNodeOptions>(o =>

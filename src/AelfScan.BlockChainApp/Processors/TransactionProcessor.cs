@@ -1,14 +1,8 @@
-using System.Runtime.Serialization;
 using AeFinder.Sdk.Logging;
 using AeFinder.Sdk.Processor;
-using AElf.CSharp.Core;
 using AElfScan.BlockChainApp.Entities;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Volo.Abp.DependencyInjection;
 using Volo.Abp.ObjectMapping;
-using AeFinder.Sdk.Processor;
 
 namespace AElfScan.BlockChainApp.Processors;
 
@@ -24,18 +18,17 @@ public class TransactionProcessor : TransactionProcessorBase
             "AELF", new List<string>()
             {
                 "JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE",
-                "pykr77ft9UUKJZLVq15wCH8PinBSjVRQ12sD1Ayq92mKFsJ1i"
+                "pGa4e5hNGsgkfjEGm72TEvbF7aRDqKBd4LuXtab4ucMbXLcgJ"
             }
         },
         {
             "tDVV", new List<string>()
             {
                 "7RzVGiuVWkvL4VfVHdZfQF2Tri3sgLe9U991bohHFfSRZXuGX",
-                "2dtnkWDyJJXeDRcREhKSZHrYdDGMbn3eus5KYpXonfoTygFHZm"
+                "BNPFPPwQ3DE9rwxzdY61Q2utU9FZx9KYUnrYHQqCR6N4LLhUE"
             }
         }
     };
-
 
     protected IAeFinderLogger Logger => this.LazyServiceProvider.LazyGetService<IAeFinderLogger>();
 
@@ -44,23 +37,34 @@ public class TransactionProcessor : TransactionProcessorBase
         Logger.LogInformation($"start processor transaction data:{context.Block.BlockHeight}");
         var transactionInfo = ObjectMapper.Map<Transaction, TransactionInfo>(transaction);
 
+        Logger.LogInformation("step 1 {c}", context.ChainId);
         transactionInfo.BlockHeight = context.Block.BlockHeight;
         transactionInfo.Fee = GetTransactionFees(transaction.ExtraProperties);
+
+        Logger.LogInformation("step 2 {c}", context.ChainId);
         transactionInfo.Id = IdGenerateHelper.GetId(context.ChainId, transaction.TransactionId);
 
         await SaveEntityAsync(transactionInfo);
+        Logger.LogInformation("step 3 {c}", context.ChainId);
         await HandlerTransactionCountInfoAsync(context.ChainId);
+        Logger.LogInformation("step 4 {c}", context.ChainId);
         await HandlerAddressTransactionCountInfoAsync(context.ChainId, transaction.From);
+        Logger.LogInformation("step 5 {c}", context.ChainId);
         await HandlerAddressTransactionCountInfoAsync(context.ChainId, transaction.To);
+        Logger.LogInformation("step 6 {c}", context.ChainId);
 
         await HandlerContractBlockTransactionRecordAsync(context.ChainId, transaction.TransactionId,
             context.Block.BlockHeight, transaction.From);
+        Logger.LogInformation("step 7 {c}", context.ChainId);
 
         await HandlerContractBlockTransactionRecordAsync(context.ChainId, transaction.TransactionId,
             context.Block.BlockHeight, transaction.To);
+        Logger.LogInformation("step 8 {c}", context.ChainId);
 
         await DeleteNoUseTransactionInfoAsync(context.Block.BlockHeight, context.ChainId, transaction.From);
+        Logger.LogInformation("step 9 {c}", context.ChainId);
         await DeleteNoUseTransactionInfoAsync(context.Block.BlockHeight, context.ChainId, transaction.To);
+        Logger.LogInformation("step 10 {c}", context.ChainId);
     }
 
 
@@ -129,8 +133,22 @@ public class TransactionProcessor : TransactionProcessorBase
         }
 
         var id = IdGenerateHelper.GetId(chainId, address);
+        Logger.LogInformation("get  AddressTransactionCountInfo id:{c}", id);
+
+        try
+        {
+            var transactionCountInfo1 =
+                await GetEntityAsync<AddressTransactionCountInfo>(id);
+        }
+        catch (Exception e)
+        {
+            Logger.LogInformation(e, "get  AddressTransactionCountInfo id:{c}，err", id);
+            throw e;
+        }
+
         var transactionCountInfo =
             await GetEntityAsync<AddressTransactionCountInfo>(id);
+
         if (transactionCountInfo != null)
         {
             transactionCountInfo.Count++;
