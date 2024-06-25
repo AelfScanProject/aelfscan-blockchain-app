@@ -12,7 +12,10 @@ public class RentalChargedProcessor : TokenProcessorBase<RentalCharged>
         {
             return;
         }
-
+        if (BlockChainAppConstants.StartProcessBalanceEventHeight[context.ChainId] > context.Block.BlockHeight)
+        {
+            return;
+        }
         var transactionInfo = await GetEntityAsync<TransactionInfo>(IdGenerateHelper.GetId(context.ChainId,context.Transaction.TransactionId));
 
         transactionInfo.TransactionValue += logEvent.Amount;
