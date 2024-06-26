@@ -17,7 +17,7 @@ public class BlockChainAppModule : AbpModule
 
         context.Services.AddSingleton<ITokenContractAddressProvider, TokenContractAddressProvider>();
         context.Services.AddSingleton<ILogEventProcessor, CrossChainReceivedProcessor>();
-        context.Services.AddSingleton<ILogEventProcessor, CrossChainTransferredProcessor>();
+        context.Services.AddSingleton<ILogEventProcessor, BurnedProcessor>();
         context.Services.AddSingleton<ILogEventProcessor, IssuedProcessor>();
         context.Services.AddSingleton<ILogEventProcessor, RentalChargedProcessor>();
         context.Services.AddSingleton<ILogEventProcessor, ResourceTokenClaimedProcessor>();

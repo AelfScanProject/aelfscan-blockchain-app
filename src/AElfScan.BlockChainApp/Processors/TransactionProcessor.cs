@@ -10,73 +10,42 @@ public class TransactionProcessor : TransactionProcessorBase
 {
     private IObjectMapper ObjectMapper => LazyServiceProvider.LazyGetRequiredService<IObjectMapper>();
 
-    private const long BlockHeightDifference = 250000;
-
-    public static readonly Dictionary<string, List<string>> AddressListMap = new()
-    {
-        {
-            "AELF", new List<string>()
-            {
-                "JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE",
-                "pGa4e5hNGsgkfjEGm72TEvbF7aRDqKBd4LuXtab4ucMbXLcgJ"
-            }
-        },
-        {
-            "tDVV", new List<string>()
-            {
-                "7RzVGiuVWkvL4VfVHdZfQF2Tri3sgLe9U991bohHFfSRZXuGX",
-                "BNPFPPwQ3DE9rwxzdY61Q2utU9FZx9KYUnrYHQqCR6N4LLhUE"
-            }
-        }
-    };
+    private const long BlockHeightDifference = 500000;
 
     protected IAeFinderLogger Logger => this.LazyServiceProvider.LazyGetService<IAeFinderLogger>();
 
     public override async Task ProcessAsync(Transaction transaction, TransactionContext context)
     {
-        Logger.LogInformation($"start processor transaction data:{context.Block.BlockHeight}");
-        var transactionInfo = ObjectMapper.Map<Transaction, TransactionInfo>(transaction);
-
-        Logger.LogInformation("step 1 {c}", context.ChainId);
-        transactionInfo.BlockHeight = context.Block.BlockHeight;
-        transactionInfo.Fee = GetTransactionFees(transaction.ExtraProperties);
-
-        Logger.LogInformation("step 2 {c}", context.ChainId);
-        transactionInfo.Id = IdGenerateHelper.GetId(context.ChainId, transaction.TransactionId);
-
-        await SaveEntityAsync(transactionInfo);
-        Logger.LogInformation("step 3 {c}", context.ChainId);
         await HandlerTransactionCountInfoAsync(context.ChainId);
-        Logger.LogInformation("step 4 {c}", context.ChainId);
         await HandlerAddressTransactionCountInfoAsync(context.ChainId, transaction.From);
-        Logger.LogInformation("step 5 {c}", context.ChainId);
         await HandlerAddressTransactionCountInfoAsync(context.ChainId, transaction.To);
-        Logger.LogInformation("step 6 {c}", context.ChainId);
+        string address = IsContractAddress(context.ChainId, transaction.From) ? transaction.From : 
+            IsContractAddress(context.ChainId, transaction.To) ? transaction.To : null;
+        if (address == null || BlockChainAppConstants.TransactionBeginHeight[context.ChainId] <= context.Block.BlockHeight)
+        {
+            var transactionInfo = ObjectMapper.Map<Transaction, TransactionInfo>(transaction);
+            transactionInfo.BlockHeight = context.Block.BlockHeight;
+            transactionInfo.Fee = GetTransactionFees(transaction.ExtraProperties);
+            transactionInfo.Id = IdGenerateHelper.GetId(context.ChainId, transaction.TransactionId);
+
+            await SaveEntityAsync(transactionInfo);
+        }
 
         await HandlerContractBlockTransactionRecordAsync(context.ChainId, transaction.TransactionId,
-            context.Block.BlockHeight, transaction.From);
-        Logger.LogInformation("step 7 {c}", context.ChainId);
-
-        await HandlerContractBlockTransactionRecordAsync(context.ChainId, transaction.TransactionId,
-            context.Block.BlockHeight, transaction.To);
-        Logger.LogInformation("step 8 {c}", context.ChainId);
-
-        await DeleteNoUseTransactionInfoAsync(context.Block.BlockHeight, context.ChainId, transaction.From);
-        Logger.LogInformation("step 9 {c}", context.ChainId);
-        await DeleteNoUseTransactionInfoAsync(context.Block.BlockHeight, context.ChainId, transaction.To);
-        Logger.LogInformation("step 10 {c}", context.ChainId);
+            context.Block.BlockHeight, address);
+        await DeleteNoUseTransactionInfoAsync(context.Block.BlockHeight, context.ChainId, address);
     }
 
 
     private async Task DeleteNoUseTransactionInfoAsync(long blockHeight, string chainId, string address)
     {
-        if (!IsContractAddress(chainId, address))
+        if (address == null)
         {
             return;
         }
 
         var deleteBlockHeight = blockHeight - BlockHeightDifference;
-        if (deleteBlockHeight <= 0)
+        if (deleteBlockHeight <= BlockChainAppConstants.TransactionBeginHeight[chainId])
         {
             return;
         }
@@ -133,18 +102,6 @@ public class TransactionProcessor : TransactionProcessorBase
         }
 
         var id = IdGenerateHelper.GetId(chainId, address);
-        Logger.LogInformation("get  AddressTransactionCountInfo id:{c}", id);
-
-        try
-        {
-            var transactionCountInfo1 =
-                await GetEntityAsync<AddressTransactionCountInfo>(id);
-        }
-        catch (Exception e)
-        {
-            Logger.LogInformation(e, "get  AddressTransactionCountInfo id:{c}，err", id);
-            throw e;
-        }
 
         var transactionCountInfo =
             await GetEntityAsync<AddressTransactionCountInfo>(id);
@@ -163,9 +120,6 @@ public class TransactionProcessor : TransactionProcessorBase
                 Address = address
             };
         }
-
-        Logger.LogInformation($"Address:{address} transaction count incr to:{transactionCountInfo.Count}");
-
         await SaveEntityAsync(transactionCountInfo);
     }
 
@@ -174,11 +128,16 @@ public class TransactionProcessor : TransactionProcessorBase
         long blockHeight,
         string address)
     {
-        if (!IsContractAddress(chainId, address))
+        if (address == null )
         {
             return;
         }
 
+        if (BlockChainAppConstants.TransactionBeginHeight[chainId] > blockHeight)
+        {
+            return;
+        }
+       
         var id = IdGenerateHelper.GetId(chainId, blockHeight, address);
 
         var blockTransactionInfo =
@@ -242,7 +201,7 @@ public class TransactionProcessor : TransactionProcessorBase
             return false;
         }
 
-        if (!AddressListMap.TryGetValue(chainId, out var list))
+        if (!BlockChainAppConstants.TransactionAddressListMap.TryGetValue(chainId, out var list))
         {
             return false;
         }

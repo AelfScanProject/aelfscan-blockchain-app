@@ -1,4 +1,5 @@
 using AeFinder.Block.Dtos;
+using AeFinder.Sdk;
 using AeFinder.Sdk.Processor;
 using AElfScan.BlockChainApp.Entities;
 using AElfScan.BlockChainApp.GraphQL;
@@ -9,13 +10,28 @@ using Query = AElfScan.BlockChainApp.GraphQL.Query;
 
 namespace AElfScan.BlockChainApp.Processors;
 
-public class TransactionProcessorTests : TokenContractAppTestBase
+public partial class TransactionProcessorTests : TokenContractAppTestBase
 {
     private readonly TransactionProcessor _transactionProcessor;
+    private readonly BurnedProcessor _burnedProcessor;
+    private readonly CrossChainReceivedProcessor _crossChainReceivedProcessor;
+    private readonly IssuedProcessor _issuedProcessor;
+    private readonly RentalChargedProcessor _rentalChargedProcessor;
+    private readonly ResourceTokenClaimedProcessor _resourceTokenClaimedProcessor;
+    private readonly TransferredProcessor _transferredProcessor;
+    private readonly IReadOnlyRepository<TransactionInfo> _transactionInfoRepository;
 
     public TransactionProcessorTests()
     {
         _transactionProcessor = GetRequiredService<TransactionProcessor>();
+        _burnedProcessor = GetRequiredService<BurnedProcessor>();
+        _crossChainReceivedProcessor = GetRequiredService<CrossChainReceivedProcessor>();
+        _issuedProcessor = GetRequiredService<IssuedProcessor>();
+        _rentalChargedProcessor = GetRequiredService<RentalChargedProcessor>();
+        _resourceTokenClaimedProcessor = GetRequiredService<ResourceTokenClaimedProcessor>();
+        _transferredProcessor = GetRequiredService<TransferredProcessor>();
+        _transferredProcessor = GetRequiredService<TransferredProcessor>();
+        _transactionInfoRepository = GetRequiredService<IReadOnlyRepository<TransactionInfo>>();
     }
 
     [Fact]

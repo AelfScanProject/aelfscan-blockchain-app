@@ -108,6 +108,40 @@ public abstract class TokenContractAppTestBase : AElfScanBlockChainAppOrleansTes
             LogEvent = logEvent
         };
     }
+    
+    protected LogEventContext GenerateLogEventContext<T>(T eventData,string TransactionId) where T : IEvent<T>
+    {
+        var logEvent = eventData.ToLogEvent().ToSdkLogEvent();
+
+        return new LogEventContext
+        {
+            ChainId = ChainId,
+            Block = new LightBlock
+            {
+                BlockHash = BlockHash,
+                BlockHeight = BlockHeight,
+                BlockTime = DateTime.UtcNow,
+                PreviousBlockHash = PreviousBlockHash
+            },
+            Transaction = new AeFinder.Sdk.Processor.Transaction()
+            {
+                TransactionId = TransactionId,
+                Status = TransactionStatus.Mined,
+                
+                ExtraProperties = new Dictionary<string, string>
+                {
+                    {
+                        "TransactionFee", JsonConvert.SerializeObject(new Dictionary<string, long>
+                        {
+                            { "ELF", 123L }
+                        })
+                    }
+                },
+                
+            },
+            LogEvent = logEvent
+        };
+    }
 
     protected TransactionContext GenerateTransactionContext(Transaction transaction)
     {
