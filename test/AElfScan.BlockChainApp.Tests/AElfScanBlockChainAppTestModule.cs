@@ -35,7 +35,7 @@ public class AElfScanBlockChainAppTestModule : AbpModule
         Configure<AbpAutoMapperOptions>(options => { options.AddMaps<AElfScanBlockChainAppTestModule>(); });
 
         context.Services.AddSingleton<CrossChainReceivedProcessor>();
-        context.Services.AddSingleton<CrossChainTransferredProcessor>();
+        context.Services.AddSingleton<BurnedProcessor>();
         context.Services.AddSingleton<IssuedProcessor>();
         context.Services.AddSingleton<RentalChargedProcessor>();
         context.Services.AddSingleton<ResourceTokenClaimedProcessor>();

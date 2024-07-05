@@ -12,11 +12,14 @@ public class ResourceTokenClaimedProcessor : TokenProcessorBase<ResourceTokenCla
         {
             return;
         }
-
+       
         var transactionInfo =
             await GetEntityAsync<TransactionInfo>(IdGenerateHelper.GetId(context.ChainId,
                 context.Transaction.TransactionId));
-
+        if (transactionInfo == null)
+        {
+            return;
+        }
         transactionInfo.TransactionValue += logEvent.Amount;
         await SaveEntityAsync(transactionInfo);
     }
