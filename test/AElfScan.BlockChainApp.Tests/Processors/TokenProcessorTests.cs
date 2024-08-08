@@ -153,10 +153,15 @@ public partial class TransactionProcessorTests
     }
     private async Task handleTransaction_Test(string from,string to,long blockHeight)
     {
+       await handleTransaction_Test(from,to,blockHeight,"UpdateTinyBlockInformation");
+    }
+    
+    private async Task handleTransaction_Test(string from,string to,long blockHeight,string method)
+    {
         var transaction1 = new Transaction()
         {
             TransactionId = DefaultTransactionId,
-            MethodName = "testMethod1",
+            MethodName = method,
             From = from,
             To = to,
         };
