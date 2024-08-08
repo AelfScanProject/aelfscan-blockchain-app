@@ -20,6 +20,7 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
     private readonly ResourceTokenClaimedProcessor _resourceTokenClaimedProcessor;
     private readonly TransferredProcessor _transferredProcessor;
     private readonly IReadOnlyRepository<TransactionInfo> _transactionInfoRepository;
+    private readonly IReadOnlyRepository<ContractBlockTransactionRecord> _blockTransactionInfoRepository;
 
     public TransactionProcessorTests()
     {
@@ -32,6 +33,7 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
         _transferredProcessor = GetRequiredService<TransferredProcessor>();
         _transferredProcessor = GetRequiredService<TransferredProcessor>();
         _transactionInfoRepository = GetRequiredService<IReadOnlyRepository<TransactionInfo>>();
+        _blockTransactionInfoRepository =  GetRequiredService<IReadOnlyRepository<ContractBlockTransactionRecord>>();
     }
 
     [Fact]
@@ -136,5 +138,92 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
 
         transactionResult3.Items.Count.ShouldBe(2);
         transactionResult3.TotalCount.ShouldBe(3);
+    }
+
+    [Fact]
+    public async Task SkipTransaction_Test()
+    {
+        await handleTransaction_Test("From", BlockChainAppConstants.TransactionAddressListMap[ChainId][0], 100,"UpdateTinyBlockInformation");
+        var queryable = await _transactionInfoRepository.GetQueryableAsync(); 
+        var result = queryable.Where(o => o.Metadata.ChainId == "AELF").Where(o => o.TransactionId == DefaultTransactionId)
+            .ToList(); 
+        result.Count.ShouldBe(0);
+        await handleTransaction_Test("From", BlockChainAppConstants.TransactionAddressListMap[ChainId][0], 100,"aa");
+        queryable = await _transactionInfoRepository.GetQueryableAsync(); 
+        result = queryable.Where(o => o.Metadata.ChainId == "AELF").Where(o => o.TransactionId == DefaultTransactionId)
+            .ToList(); 
+        result.Count.ShouldBe(1);
+      
+    }
+    
+    [Fact]
+    public async Task SaveSkipTransaction_Test()
+    {
+        BlockChainAppConstants.TransactionBeginHeight[ChainId] = 1;
+        await handleTransaction_Test("From", BlockChainAppConstants.TransactionAddressListMap[ChainId][0], 100,"UpdateTinyBlockInformation");
+        var queryable = await _transactionInfoRepository.GetQueryableAsync(); 
+        var result = queryable.Where(o => o.Metadata.ChainId == "AELF").Where(o => o.TransactionId == DefaultTransactionId)
+            .ToList(); 
+        result.Count.ShouldBe(1);
+        var queryable2 = await _blockTransactionInfoRepository.GetQueryableAsync(); 
+        var result2 = queryable2.Where(o => o.Metadata.ChainId == "AELF")
+            .ToList(); 
+        result2.Count.ShouldBe(1);
+    }
+    
+    [Fact]
+    public async Task SaveSkipTransactionTwice_Test()
+    {
+        await SaveSkipTransaction_Test();
+        var transaction1 = new Transaction()
+        {
+            TransactionId = "test2",
+            MethodName = "UpdateTinyBlockInformation",
+            From = "From",
+            To = BlockChainAppConstants.TransactionAddressListMap[ChainId][0],
+        };
+        var transactionContext1 = GenerateTransactionContext(transaction1);
+        transactionContext1.Block.BlockHeight = 100;
+        transactionContext1.Block.BlockTime = DateTime.Today.AddDays(-2);
+       
+        await _transactionProcessor.ProcessAsync(transaction1, transactionContext1);
+        await SaveDataAsync();
+        
+       var queryable = await _transactionInfoRepository.GetQueryableAsync(); 
+       var result = queryable.Where(o => o.Metadata.ChainId == "AELF")
+            .ToList(); 
+        result.Count.ShouldBe(2);
+       var  queryable2 = await _blockTransactionInfoRepository.GetQueryableAsync(); 
+       var  result2 = queryable2.Where(o => o.Metadata.ChainId == "AELF")
+            .ToList(); 
+        result2.Count.ShouldBe(1);
+    }
+    
+    [Fact]
+    public async Task DelSkipTransaction_Test()
+    {
+        await SaveSkipTransaction_Test();
+        var transaction1 = new Transaction()
+        {
+            TransactionId = "test2",
+            MethodName = "UpdateTinyBlockInformation",
+            From = "From",
+            To = BlockChainAppConstants.TransactionAddressListMap[ChainId][0],
+        };
+        var transactionContext1 = GenerateTransactionContext(transaction1);
+        transactionContext1.Block.BlockHeight = 100 + 500000;
+        transactionContext1.Block.BlockTime = DateTime.Today.AddDays(-2);
+       
+        await _transactionProcessor.ProcessAsync(transaction1, transactionContext1);
+        await SaveDataAsync();
+        
+        var queryable = await _transactionInfoRepository.GetQueryableAsync(); 
+        var result = queryable.Where(o => o.Metadata.ChainId == "AELF").Where(o => o.TransactionId == DefaultTransactionId)
+            .ToList(); 
+        result.Count.ShouldBe(0);
+        var queryable2 = await _blockTransactionInfoRepository.GetQueryableAsync(); 
+        var  result2 = queryable2.Where(o => o.Metadata.ChainId == "AELF")
+            .ToList(); 
+        result2.Count.ShouldBe(1);
     }
 }

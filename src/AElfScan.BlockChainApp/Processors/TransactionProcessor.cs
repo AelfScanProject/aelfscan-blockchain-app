@@ -12,6 +12,11 @@ public class TransactionProcessor : TransactionProcessorBase
 
     private const long BlockHeightDifference = 500000;
 
+    private static readonly List<string> SkipMethodList = new()
+    {
+        "DonateResourceToken","UpdateTinyBlockInformation","UpdateValue","NextRound","ApproveMultiProposals","TestTransfer"
+    };
+
     protected IAeFinderLogger Logger => this.LazyServiceProvider.LazyGetService<IAeFinderLogger>();
 
     public override async Task ProcessAsync(Transaction transaction, TransactionContext context)
@@ -19,27 +24,27 @@ public class TransactionProcessor : TransactionProcessorBase
         await HandlerTransactionCountInfoAsync(context.ChainId);
         await HandlerAddressTransactionCountInfoAsync(context.ChainId, transaction.From);
         await HandlerAddressTransactionCountInfoAsync(context.ChainId, transaction.To);
-        string address = IsContractAddress(context.ChainId, transaction.From) ? transaction.From : 
-            IsContractAddress(context.ChainId, transaction.To) ? transaction.To : null;
-        if (address == null || BlockChainAppConstants.TransactionBeginHeight[context.ChainId] <= context.Block.BlockHeight)
+        bool skip = IsContractAddress(context.ChainId, transaction.To) &&
+                         SkipMethodList.Contains(transaction.MethodName);
+        if (skip && context.Block.BlockHeight <= BlockChainAppConstants.TransactionBeginHeight[context.ChainId])
         {
-            var transactionInfo = ObjectMapper.Map<Transaction, TransactionInfo>(transaction);
-            transactionInfo.BlockHeight = context.Block.BlockHeight;
-            transactionInfo.Fee = GetTransactionFees(transaction.ExtraProperties);
-            transactionInfo.Id = IdGenerateHelper.GetId(context.ChainId, transaction.TransactionId);
-
-            await SaveEntityAsync(transactionInfo);
+            return;
         }
+        var transactionInfo = ObjectMapper.Map<Transaction, TransactionInfo>(transaction);
+        transactionInfo.BlockHeight = context.Block.BlockHeight;
+        transactionInfo.Fee = GetTransactionFees(transaction.ExtraProperties);
+        transactionInfo.Id = IdGenerateHelper.GetId(context.ChainId, transaction.TransactionId);
+        await SaveEntityAsync(transactionInfo);
 
         await HandlerContractBlockTransactionRecordAsync(context.ChainId, transaction.TransactionId,
-            context.Block.BlockHeight, address);
-        await DeleteNoUseTransactionInfoAsync(context.Block.BlockHeight, context.ChainId, address);
+            context.Block.BlockHeight, skip);
+        await DeleteNoUseTransactionInfoAsync(context.Block.BlockHeight, context.ChainId, skip);
     }
 
 
-    private async Task DeleteNoUseTransactionInfoAsync(long blockHeight, string chainId, string address)
+    private async Task DeleteNoUseTransactionInfoAsync(long blockHeight, string chainId, bool skip)
     {
-        if (address == null)
+        if (!skip)
         {
             return;
         }
@@ -50,8 +55,7 @@ public class TransactionProcessor : TransactionProcessorBase
             return;
         }
 
-        var key = IdGenerateHelper.GetId(chainId, deleteBlockHeight,
-            address);
+        var key = IdGenerateHelper.GetId(chainId, deleteBlockHeight);
         var blockTransactionInfo =
             await GetEntityAsync<ContractBlockTransactionRecord>(key);
 
@@ -126,19 +130,13 @@ public class TransactionProcessor : TransactionProcessorBase
 
     private async Task HandlerContractBlockTransactionRecordAsync(string chainId, string transactionId,
         long blockHeight,
-        string address)
+        bool skip)
     {
-        if (address == null )
+        if (!skip)
         {
             return;
         }
-
-        if (BlockChainAppConstants.TransactionBeginHeight[chainId] > blockHeight)
-        {
-            return;
-        }
-       
-        var id = IdGenerateHelper.GetId(chainId, blockHeight, address);
+        var id = IdGenerateHelper.GetId(chainId, blockHeight);
 
         var blockTransactionInfo =
             await GetEntityAsync<ContractBlockTransactionRecord>(id);
@@ -152,7 +150,7 @@ public class TransactionProcessor : TransactionProcessorBase
             {
                 Id = id,
                 TransactionIds = new List<string> { transactionId },
-                ContractAddress = address,
+                ContractAddress = "",
                 BlockHeight = blockHeight
             };
         }
