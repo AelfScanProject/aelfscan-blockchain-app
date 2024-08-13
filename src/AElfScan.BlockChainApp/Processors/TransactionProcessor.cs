@@ -14,7 +14,8 @@ public class TransactionProcessor : TransactionProcessorBase
 
     private static readonly List<string> SkipMethodList = new()
     {
-        "DonateResourceToken","UpdateTinyBlockInformation","UpdateValue","NextRound","ApproveMultiProposals","TestTransfer"
+        "DonateResourceToken", "UpdateTinyBlockInformation", "UpdateValue", "NextRound", "ApproveMultiProposals",
+        "TestTransfer"
     };
 
     protected IAeFinderLogger Logger => this.LazyServiceProvider.LazyGetService<IAeFinderLogger>();
@@ -25,11 +26,12 @@ public class TransactionProcessor : TransactionProcessorBase
         await HandlerAddressTransactionCountInfoAsync(context.ChainId, transaction.From);
         await HandlerAddressTransactionCountInfoAsync(context.ChainId, transaction.To);
         bool skip = IsContractAddress(context.ChainId, transaction.To) &&
-                         SkipMethodList.Contains(transaction.MethodName);
+                    SkipMethodList.Contains(transaction.MethodName);
         if (skip && context.Block.BlockHeight <= BlockChainAppConstants.TransactionBeginHeight[context.ChainId])
         {
             return;
         }
+
         var transactionInfo = ObjectMapper.Map<Transaction, TransactionInfo>(transaction);
         transactionInfo.BlockHeight = context.Block.BlockHeight;
         transactionInfo.Fee = GetTransactionFees(transaction.ExtraProperties);
@@ -124,6 +126,7 @@ public class TransactionProcessor : TransactionProcessorBase
                 Address = address
             };
         }
+
         await SaveEntityAsync(transactionCountInfo);
     }
 
@@ -136,6 +139,7 @@ public class TransactionProcessor : TransactionProcessorBase
         {
             return;
         }
+
         var id = IdGenerateHelper.GetId(chainId, blockHeight);
 
         var blockTransactionInfo =
@@ -159,36 +163,45 @@ public class TransactionProcessor : TransactionProcessorBase
     }
 
 
-    private static long GetTransactionFees(Dictionary<string, string> extraProperties)
+    private long GetTransactionFees(Dictionary<string, string> extraProperties)
     {
-        var result = 0l;
-        var feeMap = new Dictionary<string, long>();
-        if (extraProperties == null)
+        try
         {
-            return 0;
-        }
-
-        if (extraProperties.TryGetValue("TransactionFee", out var transactionFee))
-        {
-            feeMap = JsonConvert.DeserializeObject<Dictionary<string, long>>(transactionFee) ??
-                     new Dictionary<string, long>();
-            if (feeMap.TryGetValue("ELF", out var fee))
+            var result = 0l;
+            var feeMap = new Dictionary<string, long>();
+            if (extraProperties == null)
             {
-                result += fee;
+                return 0;
             }
-        }
 
-        if (extraProperties.TryGetValue("ResourceFee", out var resourceFee))
-        {
-            var resourceFeeMap = JsonConvert.DeserializeObject<Dictionary<string, long>>(resourceFee) ??
-                                 new Dictionary<string, long>();
-            if (resourceFeeMap.TryGetValue("ELF", out var fee))
+            if (extraProperties.TryGetValue("TransactionFee", out var transactionFee))
             {
-                result += fee;
+                feeMap = JsonConvert.DeserializeObject<Dictionary<string, long>>(transactionFee) ??
+                         new Dictionary<string, long>();
+                if (feeMap.TryGetValue("ELF", out var fee))
+                {
+                    result += fee;
+                }
             }
+
+            if (extraProperties.TryGetValue("ResourceFee", out var resourceFee))
+            {
+                var resourceFeeMap = JsonConvert.DeserializeObject<Dictionary<string, long>>(resourceFee) ??
+                                     new Dictionary<string, long>();
+                if (resourceFeeMap.TryGetValue("ELF", out var fee))
+                {
+                    result += fee;
+                }
+            }
+
+            return result;
+        }
+        catch (Exception e)
+        {
+            Logger.LogWarning(e, "Get transaction fee error");
         }
 
-        return result;
+        return 0;
     }
 
 

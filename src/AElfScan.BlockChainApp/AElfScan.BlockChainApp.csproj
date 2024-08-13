@@ -8,6 +8,6 @@
 
     <ItemGroup>
         <PackageReference Include="AeFinder.Sdk" Version="0.0.5" />
-        <PackageReference Include="AElf.EntityMapping.Elasticsearch" Version="1.0.0-rc9.5" />
+        <PackageReference Include="AElf.EntityMapping.Elasticsearch" Version="1.0.0-rc12" />
     </ItemGroup>
 </Project>
