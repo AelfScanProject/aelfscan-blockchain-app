@@ -10,6 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="AElf.EntityMapping.Elasticsearch" Version="1.0.0-rc12" />
       <PackageReference Include="AElf.Orleans.EventSourcing.Snapshot" Version="1.0.3" />
       <PackageReference Include="Microsoft.Orleans.Client" Version="3.6.5" />
       <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.6.5">

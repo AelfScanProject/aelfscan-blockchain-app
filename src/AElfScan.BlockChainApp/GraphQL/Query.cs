@@ -36,7 +36,9 @@ public class Query
             queryable = queryable.Where(o => o.From == input.Address || o.To == input.Address);
         }
 
-        var transactionInfos = queryable.OrderByDescending(p => p.BlockHeight).Skip(input.SkipCount)
+        queryable = QueryableExtensions.TransactionInfoSort(queryable, input);
+        
+        var transactionInfos = queryable.Skip(input.SkipCount)
             .Take(input.MaxResultCount)
             .ToList();
 

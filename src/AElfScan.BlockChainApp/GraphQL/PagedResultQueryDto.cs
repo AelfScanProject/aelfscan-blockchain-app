@@ -10,6 +10,9 @@ public class PagedResultQueryDto
     public string OrderBy { get; set; }
     
     public string Sort { get; set; }
+    
+    public List<OrderInfo> OrderInfos { get; set; }
+    public List<string> SearchAfter { get; set; }
 
     public virtual void Validate()
     {
@@ -19,6 +22,30 @@ public class PagedResultQueryDto
                 $"Max allowed value for {nameof(MaxResultCount)} is {MaxMaxResultCount}.");
         }
     }
+    
+    public List<OrderInfo> GetAdaptableOrderInfos()
+    {
+        if (OrderBy.IsNullOrEmpty())
+        {
+            return OrderInfos;
+        }
+
+        return new List<OrderInfo>
+        {
+            new()
+            {
+                OrderBy = OrderBy,
+                Sort = Sort
+            }
+        };
+    }
+}
+
+public class OrderInfo
+{
+    public string OrderBy { get; set; }
+    
+    public string Sort { get; set; }
 }
 
 public enum SortType
