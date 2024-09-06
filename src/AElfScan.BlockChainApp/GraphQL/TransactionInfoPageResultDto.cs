@@ -22,6 +22,11 @@ public class GetTransactionInfosInput : PagedResultQueryDto
     public long EndTime { get; set; }
 }
 
+public class GetTransactionInfosByHashInput : PagedResultQueryDto
+{
+    public List<string> Hashs { get; set; }
+}
+
 public class TransactionInfoDto : AeFinderEntityDto
 {
     public string TransactionId { get; set; }

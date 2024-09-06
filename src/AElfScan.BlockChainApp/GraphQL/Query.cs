@@ -37,7 +37,7 @@ public class Query
         }
 
         queryable = QueryableExtensions.TransactionInfoSort(queryable, input);
-        
+
         var transactionInfos = queryable.Skip(input.SkipCount)
             .Take(input.MaxResultCount)
             .ToList();
@@ -53,7 +53,8 @@ public class Query
         {
             var queryableAsync = await addressCountRepository.GetQueryableAsync();
             // queryable.Where(w => w.ChainId == input.ChainId);
-            var transactionCountInfo = queryableAsync.Where(o => o.ChainId == input.ChainId && o.Address == input.Address)
+            var transactionCountInfo = queryableAsync
+                .Where(o => o.ChainId == input.ChainId && o.Address == input.Address)
                 .FirstOrDefault();
             totalCount = transactionCountInfo == null ? 0 : transactionCountInfo.Count;
         }
@@ -62,6 +63,33 @@ public class Query
         transactionInfoPageResultDto.Items =
             objectMapper.Map<List<TransactionInfo>, List<TransactionInfoDto>>(transactionInfos);
         transactionInfoPageResultDto.TotalCount = totalCount;
+
+        return transactionInfoPageResultDto;
+    }
+
+
+    public static async Task<TransactionInfoPageResultDto> TransactionByHash(
+        [FromServices] IReadOnlyRepository<TransactionInfo> repository,
+        [FromServices] IObjectMapper objectMapper, GetTransactionInfosByHashInput input)
+    {
+        var transactionInfoPageResultDto = new TransactionInfoPageResultDto();
+        var queryable = await repository.GetQueryableAsync();
+
+
+        if (!input.Hashs.IsNullOrEmpty())
+        {
+            var predicates = input.Hashs.Select(s =>
+                (Expression<Func<Entities.TransactionInfo, bool>>)(o => o.TransactionId == s));
+            var predicate = predicates.Aggregate((prev, next) => prev.Or(next));
+            queryable = queryable.Where(predicate);
+        }
+
+        var transactionInfos = queryable.Skip(input.SkipCount)
+            .Take(input.MaxResultCount)
+            .ToList();
+
+        transactionInfoPageResultDto.Items =
+            objectMapper.Map<List<TransactionInfo>, List<TransactionInfoDto>>(transactionInfos);
 
         return transactionInfoPageResultDto;
     }
