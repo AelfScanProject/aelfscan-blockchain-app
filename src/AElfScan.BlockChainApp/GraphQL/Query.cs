@@ -67,7 +67,7 @@ public class Query
             }
 
             var addressTransactionCountInfos = queryableAsync.ToList();
-            transactionInfoPageResultDto.TotalCount = addressTransactionCountInfos.Sum(o => o.Count);
+            totalCount = addressTransactionCountInfos.Sum(o => o.Count);
         }
 
 
