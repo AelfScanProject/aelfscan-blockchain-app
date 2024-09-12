@@ -49,6 +49,9 @@ public class QueryableExtensions
             case "TransactionId":
                 property = GetNestedPropertyExpression(parameter, "TransactionId");
                 break;
+            case "BlockTime":
+                property = GetNestedPropertyExpression(parameter, "Metadata.Block.BlockTime");
+                break;
 
             default:
                 throw new Exception("Invalid order by field");
