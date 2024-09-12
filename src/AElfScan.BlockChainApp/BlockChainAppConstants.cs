@@ -5,14 +5,16 @@ public class BlockChainAppConstants
     public static Dictionary<string, string> ContractAddresses = new()
     {
         { "AELF", "JRmBduh4nXWi1aXgdUsj5gJrzeZb2LxmrAbf7W99faZSvoAaE" },
-        { "tDVV", "7RzVGiuVWkvL4VfVHdZfQF2Tri3sgLe9U991bohHFfSRZXuGX" }
+        { "tDVW", "ASh2Wt7nSEmYqnGxPPzp4pnVDU4uhj1XW9Se5VeZcX2UDdyjx" }
     };
-    public static Dictionary<string,long> TransactionBeginHeight = new Dictionary<string, long>
+
+
+    public static Dictionary<string, long> TransactionBeginHeight = new Dictionary<string, long>
     {
-        { "AELF", 217634830 },
-        { "tDVV", 205591099 }
+        { "AELF", 193837741 },
+        { "tDVW", 133412351 }
     };
-    
+
     public static readonly Dictionary<string, List<string>> TransactionAddressListMap = new()
     {
         {
@@ -25,14 +27,13 @@ public class BlockChainAppConstants
             }
         },
         {
-            "tDVV", new List<string>()
+            "tDVW", new List<string>()
             {
-                "7RzVGiuVWkvL4VfVHdZfQF2Tri3sgLe9U991bohHFfSRZXuGX",
-                "BNPFPPwQ3DE9rwxzdY61Q2utU9FZx9KYUnrYHQqCR6N4LLhUE",
-                "4SGo3CUj3PPh3hC5oXV83WodyUaPHuz4trLoSTGFnxe84nqNr",
-                "2snHc8AMh9QMbCAa7XXmdZZVM5EBZUUPDdLjemwUJkBnL6k8z9"
+                "2KPUA5wG78nnNmK9JsRWbFiEFUEfei9WKniZuKaVziDKZRwchM",
+                "ASh2Wt7nSEmYqnGxPPzp4pnVDU4uhj1XW9Se5VeZcX2UDdyjx",
+                "2Z2cfgvH4QkL8KsEKegYJRJ4JC3QYkCVVptF1mvtQVNgZXRL6u",
+                "2PC7Jhb5V6iZXxz8uQUWvWubYkAoCVhtRGSL7VhTWX85R8DBuN"
             }
         }
     };
-    
 }

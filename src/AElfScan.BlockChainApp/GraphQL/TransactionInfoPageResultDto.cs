@@ -20,6 +20,7 @@ public class GetTransactionInfosInput : PagedResultQueryDto
     public long StartTime { get; set; }
 
     public long EndTime { get; set; }
+
 }
 
 public class GetTransactionInfosByHashInput : PagedResultQueryDto

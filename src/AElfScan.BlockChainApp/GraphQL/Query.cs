@@ -17,7 +17,6 @@ public class Query
     {
         var transactionInfoPageResultDto = new TransactionInfoPageResultDto();
         var queryable = await repository.GetQueryableAsync();
-
         if (!input.ChainId.IsNullOrWhiteSpace())
         {
             queryable = queryable.Where(o => o.Metadata.ChainId == input.ChainId);
@@ -47,16 +46,28 @@ public class Query
 
         if (input.Address.IsNullOrEmpty())
         {
-            totalCount = countQueryable.Where(p => p.Id == input.ChainId).FirstOrDefault().Count;
+            if (!input.ChainId.IsNullOrEmpty())
+            {
+                countQueryable = countQueryable.Where((c => c.Id == input.ChainId));
+            }
+
+
+            var countList = countQueryable.ToList();
+            totalCount = countList.Sum(o => o.Count);
         }
         else
         {
             var queryableAsync = await addressCountRepository.GetQueryableAsync();
-            // queryable.Where(w => w.ChainId == input.ChainId);
-            var transactionCountInfo = queryableAsync
-                .Where(o => o.ChainId == input.ChainId && o.Address == input.Address)
-                .FirstOrDefault();
-            totalCount = transactionCountInfo == null ? 0 : transactionCountInfo.Count;
+            queryableAsync = queryableAsync
+                .Where(o => o.Address == input.Address);
+
+            if (!input.ChainId.IsNullOrEmpty())
+            {
+                queryableAsync = queryableAsync.Where(o => o.ChainId == input.ChainId);
+            }
+
+            var addressTransactionCountInfos = queryableAsync.ToList();
+            transactionInfoPageResultDto.TotalCount = addressTransactionCountInfos.Sum(o => o.Count);
         }
 
 
@@ -101,10 +112,15 @@ public class Query
         var transactionCountDto = new TransactionCountDto();
         var queryable = await repository.GetQueryableAsync();
 
-        var transactionCountInfo = queryable.Where(o => o.Id == input.ChainId).FirstOrDefault();
+        if (!input.ChainId.IsNullOrEmpty())
+        {
+            queryable = queryable.Where(o => o.Id == input.ChainId);
+        }
 
+        var transactionCountInfos = queryable.ToList();
+        var totalCount = transactionCountInfos.Sum(o => o.Count);
 
-        transactionCountDto.Count = transactionCountInfo.Count;
+        transactionCountDto.Count = totalCount;
 
         return transactionCountDto;
     }
