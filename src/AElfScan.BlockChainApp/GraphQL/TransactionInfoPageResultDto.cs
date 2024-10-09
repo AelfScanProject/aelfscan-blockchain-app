@@ -34,4 +34,7 @@ public class TransactionInfoDto : AeFinderEntityDto
     public long TransactionValue { get; set; }
 
     public long Fee { get; set; }
+    
+    public int Index { get; set; }
+    
 }

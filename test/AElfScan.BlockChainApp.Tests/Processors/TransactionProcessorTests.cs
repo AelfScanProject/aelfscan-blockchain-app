@@ -44,7 +44,8 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
             TransactionId = "testId1",
             MethodName = "testMethod1",
             From = "testFrom1",
-            To = "to1"
+            To = "to1",
+            Index = 1
         };
 
 
@@ -53,7 +54,8 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
             TransactionId = "testId2",
             MethodName = "testMethod2",
             From = "testFrom2",
-            To = "to2"
+            To = "to2",
+            Index = 2
         };
 
         var transaction3 = new Transaction()
@@ -61,7 +63,8 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
             TransactionId = "testId3",
             MethodName = "testMethod3",
             From = "testFrom3",
-            To = "to3"
+            To = "to3",
+            Index = 3
         };
 
 
@@ -81,15 +84,6 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
         await _transactionProcessor.ProcessAsync(transaction1, transactionContext1);
         await SaveDataAsync();
 
-
-        var result = Query.AddressTransactionCount(AddressTransactionCountRepository, ObjectMapper,
-            new GetAddressTransactionCountInput()
-            {
-                ChainId = "AELF",
-                AddressList = new List<string>() { "testFrom1" }
-            });
-        
-        
             
         var transactionResult = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
             TransactionCountInfoReadOnlyRepository, AddressTransactionCountRepository, ObjectMapper,
@@ -103,7 +97,7 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
 
         transactionResult.Items.Count.ShouldBe(1);
         transactionResult.TotalCount.ShouldBe(1);
-
+        transactionResult.Items[0].Index.ShouldBe(1);
         await _transactionProcessor.ProcessAsync(transaction2, transactionContext2);
         await SaveDataAsync();
 
@@ -225,5 +219,6 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
         var  result2 = queryable2.Where(o => o.Metadata.ChainId == "AELF")
             .ToList(); 
         result2.Count.ShouldBe(1);
+       
     }
 }

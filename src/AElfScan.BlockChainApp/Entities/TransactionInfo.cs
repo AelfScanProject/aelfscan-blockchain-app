@@ -14,7 +14,7 @@ public class TransactionInfo : AeFinderEntity, IAeFinderEntity
     [Keyword] public string From { get; set; }
     [Keyword] public string To { get; set; }
     public long TransactionValue { get; set; }
-
-
     public long Fee { get; set; }
+    
+    public int Index { get; set; }
 }
