@@ -1,5 +1,6 @@
 using AeFinder.Sdk;
 using AeFinder.Sdk.Processor;
+using AElf.Contracts.MultiToken;
 using AElfScan.BlockChainApp.Entities;
 using AElfScan.BlockChainApp.GraphQL;
 using Shouldly;
@@ -8,7 +9,7 @@ using Query = AElfScan.BlockChainApp.GraphQL.Query;
 
 namespace AElfScan.BlockChainApp.Processors;
 
-public partial class TransactionProcessorTests : TokenContractAppTestBase
+public partial class TransactionProcessorTests : BlockChainAppTestBase
 {
     private readonly TransactionProcessor _transactionProcessor;
     private readonly BurnedProcessor _burnedProcessor;
@@ -216,6 +217,87 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
         var result2 = queryable2.Where(o => o.Metadata.ChainId == "AELF")
             .ToList();
         result2.Count.ShouldBe(1);
+       
+    }
+    
+    
+     [Fact]
+    public async Task HandlerTransactionAmount_Test()
+    {
+        var transaction2 = new Transaction()
+        {
+            TransactionId = "testId2",
+            MethodName = "testMethod2",
+            From = "testFrom2",
+            To = "to2",
+            Index = 2
+        };
+        var transactionContext2 = GenerateTransactionContext(transaction2);
+        transactionContext2.Block.BlockHeight = 250001;
+        transactionContext2.Block.BlockTime = DateTime.Today;
+        await _transactionProcessor.ProcessAsync(transaction2, transactionContext2);
+
+        var issued = new Issued
+        {
+            Symbol = "ELF",
+            Amount = 10,
+            To = TestAddress
+        };
+        
+        await _issuedProcessor.ProcessAsync(GenerateLogEventContext(issued,transaction2.TransactionId));
+
+        var transactionResult2 = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
+            TransactionCountInfoReadOnlyRepository, AddressTransactionCountRepository, ObjectMapper,
+            new GetTransactionInfosInput()
+            {
+                ChainId = "AELF",
+                SkipCount = 0,
+                MaxResultCount = 2,
+            });
+
+        transactionResult2.Items.Count.ShouldBe(1);
+        transactionResult2.TotalCount.ShouldBe(1);
+        transactionResult2.Items[0].TransactionValue.ShouldBe(issued.Amount) ;
+        
+        var burned = new Burned
+        {
+            Amount = 10,
+            Symbol = "ELF",
+            Burner = TestAddress
+        };
+        await _burnedProcessor.ProcessAsync(GenerateLogEventContext(burned,transaction2.TransactionId));
+        transactionResult2 = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
+            TransactionCountInfoReadOnlyRepository, AddressTransactionCountRepository, ObjectMapper,
+            new GetTransactionInfosInput()
+            {
+                ChainId = "AELF",
+                SkipCount = 0,
+                MaxResultCount = 2,
+            });
+
+        transactionResult2.Items.Count.ShouldBe(1);
+        transactionResult2.Items[0].TransactionValue.ShouldBe(issued.Amount +burned.Amount); 
+
+        var crossChainReceived = new CrossChainReceived
+        {
+            From = TestAddress,
+            To = TestAddress,
+            Amount = 10,
+            Symbol = "ELF",
+
+        };
+        await _crossChainReceivedProcessor.ProcessAsync(GenerateLogEventContext(crossChainReceived,transaction2.TransactionId));
+        transactionResult2 = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
+            TransactionCountInfoReadOnlyRepository, AddressTransactionCountRepository, ObjectMapper,
+            new GetTransactionInfosInput()
+            {
+                ChainId = "AELF",
+                SkipCount = 0,
+                MaxResultCount = 2,
+            });
+
+        transactionResult2.Items.Count.ShouldBe(1);
+        transactionResult2.Items[0].TransactionValue.ShouldBe(issued.Amount +burned.Amount+crossChainReceived.Amount) ;
        
     }
 }

@@ -3,7 +3,7 @@ using Xunit;
 
 namespace AElfScan.BlockChainApp.Processors;
 
-public class TokenProcessorBaseTests: TokenContractAppTestBase
+public class TokenProcessorBaseTests: BlockChainAppTestBase
 {
     private readonly TransferredProcessor _transferredProcessor;
 

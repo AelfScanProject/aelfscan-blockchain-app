@@ -1,6 +1,3 @@
-using AeFinder.App.BlockProcessing;
-using AeFinder.App.BlockState;
-using AeFinder.App.OperationLimits;
 using AeFinder.App.TestBase;
 using AeFinder.Sdk;
 using AeFinder.Sdk.Processor;
@@ -15,7 +12,7 @@ using Transaction = AeFinder.Sdk.Processor.Transaction;
 
 namespace AElfScan.BlockChainApp;
 
-public abstract class TokenContractAppTestBase :  AeFinderAppTestBase<AElfScanBlockChainAppTestModule>
+public abstract class BlockChainAppTestBase :  AeFinderAppTestBase<AElfScanBlockChainAppTestModule>
 {
     protected readonly IssuedProcessor IssuedProcessor;
     protected readonly IObjectMapper ObjectMapper;
@@ -31,7 +28,7 @@ public abstract class TokenContractAppTestBase :  AeFinderAppTestBase<AElfScanBl
     protected string TransactionId = "c1e625d135171c766999274a00a7003abed24cfe59a7215aabf1472ef20a2da2";
     protected long BlockHeight = 100;
 
-    public TokenContractAppTestBase()
+    public BlockChainAppTestBase()
     {
         IssuedProcessor = GetRequiredService<IssuedProcessor>();
         ObjectMapper = GetRequiredService<IObjectMapper>();
