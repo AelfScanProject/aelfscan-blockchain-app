@@ -1,9 +1,7 @@
-using AeFinder.Block.Dtos;
 using AeFinder.Sdk;
 using AeFinder.Sdk.Processor;
 using AElfScan.BlockChainApp.Entities;
 using AElfScan.BlockChainApp.GraphQL;
-using NSubstitute.Core;
 using Shouldly;
 using Xunit;
 using Query = AElfScan.BlockChainApp.GraphQL.Query;
@@ -82,7 +80,6 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
         transactionContext3.Block.BlockTime = DateTime.Today;
 
         await _transactionProcessor.ProcessAsync(transaction1, transactionContext1);
-        await SaveDataAsync();
 
             
         var transactionResult = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
@@ -99,7 +96,6 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
         transactionResult.TotalCount.ShouldBe(1);
         transactionResult.Items[0].Index.ShouldBe(1);
         await _transactionProcessor.ProcessAsync(transaction2, transactionContext2);
-        await SaveDataAsync();
 
 
         var transactionResult2 = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
@@ -116,7 +112,6 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
 
 
         await _transactionProcessor.ProcessAsync(transaction3, transactionContext3);
-        await SaveDataAsync();
 
 
         var transactionResult3 = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
@@ -184,7 +179,6 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
         transactionContext1.Block.BlockTime = DateTime.Today.AddDays(-2);
 
         await _transactionProcessor.ProcessAsync(transaction1, transactionContext1);
-        await SaveDataAsync();
 
         var queryable = await _transactionInfoRepository.GetQueryableAsync();
         var result = queryable.Where(o => o.Metadata.ChainId == "AELF")
@@ -212,7 +206,6 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
         transactionContext1.Block.BlockTime = DateTime.Today.AddDays(-2);
 
         await _transactionProcessor.ProcessAsync(transaction1, transactionContext1);
-        await SaveDataAsync();
 
         var queryable = await _transactionInfoRepository.GetQueryableAsync();
         var result = queryable.Where(o => o.Metadata.ChainId == "AELF")

@@ -1,30 +1,22 @@
 using AeFinder.App.BlockProcessing;
 using AeFinder.App.BlockState;
 using AeFinder.App.OperationLimits;
-using AeFinder.Block.Dtos;
-using AeFinder.Grains.Grain.BlockStates;
+using AeFinder.App.TestBase;
 using AeFinder.Sdk;
 using AeFinder.Sdk.Processor;
 using AElfScan.BlockChainApp.Entities;
-using AElfScan.BlockChainApp.Orleans.TestBase;
 using AElfScan.BlockChainApp.Processors;
-using AElf.Contracts.MultiToken;
 using AElf.CSharp.Core;
 using AElf.CSharp.Core.Extension;
 using AElf.Types;
 using Newtonsoft.Json;
 using Volo.Abp.ObjectMapping;
-using Volo.Abp.Threading;
 using Transaction = AeFinder.Sdk.Processor.Transaction;
 
 namespace AElfScan.BlockChainApp;
 
-public abstract class TokenContractAppTestBase : AElfScanBlockChainAppOrleansTestBase<AElfScanBlockChainAppTestModule>
+public abstract class TokenContractAppTestBase :  AeFinderAppTestBase<AElfScanBlockChainAppTestModule>
 {
-    private readonly IAppDataIndexManagerProvider _appDataIndexManagerProvider;
-    private readonly IAppBlockStateSetProvider _appBlockStateSetProvider;
-    private readonly IOperationLimitManager _operationLimitManager;
-    private readonly IBlockProcessingContext _blockProcessingContext;
     protected readonly IssuedProcessor IssuedProcessor;
     protected readonly IObjectMapper ObjectMapper;
 
@@ -41,41 +33,15 @@ public abstract class TokenContractAppTestBase : AElfScanBlockChainAppOrleansTes
 
     public TokenContractAppTestBase()
     {
-        _appDataIndexManagerProvider = GetRequiredService<IAppDataIndexManagerProvider>();
-        _appBlockStateSetProvider = GetRequiredService<IAppBlockStateSetProvider>();
-        _operationLimitManager = GetRequiredService<IOperationLimitManager>();
-        _blockProcessingContext = GetRequiredService<IBlockProcessingContext>();
-
         IssuedProcessor = GetRequiredService<IssuedProcessor>();
         ObjectMapper = GetRequiredService<IObjectMapper>();
 
         AddressTransactionCountRepository = GetRequiredService<IReadOnlyRepository<AddressTransactionCountInfo>>();
         TransactionInfoReadOnlyRepository = GetRequiredService<IReadOnlyRepository<TransactionInfo>>();
         TransactionCountInfoReadOnlyRepository = GetRequiredService<IReadOnlyRepository<TransactionCountInfo>>();
-
-        AsyncHelper.RunSync(async () => await InitializeBlockStateSetAsync());
     }
 
-    protected async Task InitializeBlockStateSetAsync()
-    {
-        await _appBlockStateSetProvider.AddBlockStateSetAsync(ChainId, new BlockStateSet
-        {
-            Block = new BlockWithTransactionDto
-            {
-                ChainId = ChainId,
-                BlockHash = BlockHash,
-                PreviousBlockHash = PreviousBlockHash,
-                BlockHeight = BlockHeight
-            },
-            Changes = new(),
-            Processed = false
-        });
-        await _appBlockStateSetProvider.SetLongestChainBlockStateSetAsync(ChainId, BlockHash);
-
-        _operationLimitManager.ResetAll();
-        _blockProcessingContext.SetContext(ChainId, BlockHash, BlockHeight,
-            DateTime.UtcNow);
-    }
+    
 
     protected LogEventContext GenerateLogEventContext<T>(T eventData) where T : IEvent<T>
     {
@@ -157,10 +123,5 @@ public abstract class TokenContractAppTestBase : AElfScanBlockChainAppOrleansTes
             },
         };
     }
-
-    protected async Task SaveDataAsync()
-    {
-        await _appDataIndexManagerProvider.SavaDataAsync();
-        await _appBlockStateSetProvider.SetBestChainBlockStateSetAsync(ChainId, BlockHash);
-    }
+   
 }
