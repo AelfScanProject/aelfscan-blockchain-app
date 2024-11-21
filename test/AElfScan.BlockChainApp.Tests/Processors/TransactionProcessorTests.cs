@@ -225,6 +225,183 @@ public partial class TransactionProcessorTests : BlockChainAppTestBase
        
     }
     
-    
+    [Fact]
+    public async Task HandlerNullTransactionAmount_Test()
+    {
+
+        var issued = new Issued
+        {
+            Symbol = "ELF",
+            Amount = 10,
+            To = TestAddress
+        };
+        
+        await _issuedProcessor.ProcessAsync(GenerateLogEventContext(issued));
+        
+        issued = new Issued
+        {
+            Symbol = "AELF",
+            Amount = 10,
+            To = TestAddress
+        };
+        
+        await _issuedProcessor.ProcessAsync(GenerateLogEventContext(issued));
+
+        var transactionResult2 = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
+            TransactionCountInfoReadOnlyRepository, AddressTransactionCountRepository, ObjectMapper,
+            new GetTransactionInfosInput()
+            {
+                ChainId = "AELF",
+                SkipCount = 0,
+                MaxResultCount = 2,
+            });
+
+        transactionResult2.Items.Count.ShouldBe(0);
+        
+        var burned = new Burned
+        {
+            Amount = 10,
+            Symbol = "ELF",
+            Burner = TestAddress
+        };
+        await _burnedProcessor.ProcessAsync(GenerateLogEventContext(burned));
+        
+        burned = new Burned
+        {
+            Amount = 10,
+            Symbol = "AELF",
+            Burner = TestAddress
+        };
+        await _burnedProcessor.ProcessAsync(GenerateLogEventContext(burned));
+        transactionResult2 = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
+            TransactionCountInfoReadOnlyRepository, AddressTransactionCountRepository, ObjectMapper,
+            new GetTransactionInfosInput()
+            {
+                ChainId = "AELF",
+                SkipCount = 0,
+                MaxResultCount = 2,
+            });
+
+        transactionResult2.Items.Count.ShouldBe(0);
+
+        var crossChainReceived = new CrossChainReceived
+        {
+            From = TestAddress,
+            To = TestAddress,
+            Amount = 10,
+            Symbol = "ELF",
+
+        };
+        await _crossChainReceivedProcessor.ProcessAsync(GenerateLogEventContext(crossChainReceived));
+        
+        crossChainReceived = new CrossChainReceived
+        {
+            From = TestAddress,
+            To = TestAddress,
+            Amount = 10,
+            Symbol = "AELF",
+
+        };
+        await _crossChainReceivedProcessor.ProcessAsync(GenerateLogEventContext(crossChainReceived));
+
+        transactionResult2 = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
+            TransactionCountInfoReadOnlyRepository, AddressTransactionCountRepository, ObjectMapper,
+            new GetTransactionInfosInput()
+            {
+                ChainId = "AELF",
+                SkipCount = 0,
+                MaxResultCount = 2,
+            });
+
+        transactionResult2.Items.Count.ShouldBe(0);
+        
+        var rentalCharged = new RentalCharged
+        {
+            Amount = 10,
+            Payer = TestAddress,
+            Receiver = TestAddress,
+            Symbol = "ELF",
+        };
+        await _rentalChargedProcessor.ProcessAsync(GenerateLogEventContext(rentalCharged));
+        
+        rentalCharged = new RentalCharged
+        {
+            Amount = 10,
+            Payer = TestAddress,
+            Receiver = TestAddress,
+            Symbol = "AELF",
+        };
+        await _rentalChargedProcessor.ProcessAsync(GenerateLogEventContext(rentalCharged));
+        transactionResult2 = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
+            TransactionCountInfoReadOnlyRepository, AddressTransactionCountRepository, ObjectMapper,
+            new GetTransactionInfosInput()
+            {
+                ChainId = "AELF",
+                SkipCount = 0,
+                MaxResultCount = 2,
+            });
+
+        transactionResult2.Items.Count.ShouldBe(0);
+        
+        
+        var resourceTokenClaimed = new ResourceTokenClaimed()
+        {
+            Amount = 10,
+            Payer = TestAddress,
+            Receiver = TestAddress,
+            Symbol = "ELF",
+        };
+        await _resourceTokenClaimedProcessor.ProcessAsync(GenerateLogEventContext(resourceTokenClaimed));
+        
+        resourceTokenClaimed = new ResourceTokenClaimed()
+        {
+            Amount = 10,
+            Payer = TestAddress,
+            Receiver = TestAddress,
+            Symbol = "AELF",
+        };
+        await _resourceTokenClaimedProcessor.ProcessAsync(GenerateLogEventContext(resourceTokenClaimed));
+        
+        transactionResult2 = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
+            TransactionCountInfoReadOnlyRepository, AddressTransactionCountRepository, ObjectMapper,
+            new GetTransactionInfosInput()
+            {
+                ChainId = "AELF",
+                SkipCount = 0,
+                MaxResultCount = 2,
+            });
+
+        transactionResult2.Items.Count.ShouldBe(0);
+        
+        var transferred = new Transferred
+        {
+            From = TestAddress,
+            To = TestAddress,
+            Amount = 10,
+            Symbol = "ELF",
+
+        };
+        await _transferredProcessor.ProcessAsync(GenerateLogEventContext(transferred));
+        transferred = new Transferred
+        {
+            From = TestAddress,
+            To = TestAddress,
+            Amount = 10,
+            Symbol = "AELF",
+
+        };
+        await _transferredProcessor.ProcessAsync(GenerateLogEventContext(transferred));
+        transactionResult2 = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
+            TransactionCountInfoReadOnlyRepository, AddressTransactionCountRepository, ObjectMapper,
+            new GetTransactionInfosInput()
+            {
+                ChainId = "AELF",
+                SkipCount = 0,
+                MaxResultCount = 2,
+            });
+
+        transactionResult2.Items.Count.ShouldBe(0);
+       
+    }
     
 }
