@@ -33,7 +33,7 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
         _transferredProcessor = GetRequiredService<TransferredProcessor>();
         _transferredProcessor = GetRequiredService<TransferredProcessor>();
         _transactionInfoRepository = GetRequiredService<IReadOnlyRepository<TransactionInfo>>();
-        _blockTransactionInfoRepository =  GetRequiredService<IReadOnlyRepository<ContractBlockTransactionRecord>>();
+        _blockTransactionInfoRepository = GetRequiredService<IReadOnlyRepository<ContractBlockTransactionRecord>>();
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
             To = "to3",
             Index = 3
         };
-
+        
 
         var transactionContext1 = GenerateTransactionContext(transaction1);
         transactionContext1.Block.BlockHeight = 1;
@@ -103,7 +103,7 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
 
 
         var transactionResult2 = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
-            TransactionCountInfoReadOnlyRepository,AddressTransactionCountRepository, ObjectMapper,
+            TransactionCountInfoReadOnlyRepository, AddressTransactionCountRepository, ObjectMapper,
             new GetTransactionInfosInput()
             {
                 ChainId = "AELF",
@@ -120,7 +120,7 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
 
 
         var transactionResult3 = await Query.TransactionInfos(TransactionInfoReadOnlyRepository,
-            TransactionCountInfoReadOnlyRepository,AddressTransactionCountRepository, ObjectMapper,
+            TransactionCountInfoReadOnlyRepository, AddressTransactionCountRepository, ObjectMapper,
             new GetTransactionInfosInput()
             {
                 ChainId = "AELF",
@@ -137,34 +137,37 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
     [Fact]
     public async Task SkipTransaction_Test()
     {
-        await handleTransaction_Test("From", BlockChainAppConstants.TransactionAddressListMap[ChainId][0], 100,"UpdateTinyBlockInformation");
-        var queryable = await _transactionInfoRepository.GetQueryableAsync(); 
-        var result = queryable.Where(o => o.Metadata.ChainId == "AELF").Where(o => o.TransactionId == DefaultTransactionId)
-            .ToList(); 
+        await handleTransaction_Test("From", BlockChainAppConstants.TransactionAddressListMap[ChainId][0], 100,
+            "UpdateTinyBlockInformation");
+        var queryable = await _transactionInfoRepository.GetQueryableAsync();
+        var result = queryable.Where(o => o.Metadata.ChainId == "AELF")
+            .Where(o => o.TransactionId == DefaultTransactionId)
+            .ToList();
         result.Count.ShouldBe(0);
-        await handleTransaction_Test("From", BlockChainAppConstants.TransactionAddressListMap[ChainId][0], 100,"aa");
-        queryable = await _transactionInfoRepository.GetQueryableAsync(); 
+        await handleTransaction_Test("From", BlockChainAppConstants.TransactionAddressListMap[ChainId][0], 100, "aa");
+        queryable = await _transactionInfoRepository.GetQueryableAsync();
         result = queryable.Where(o => o.Metadata.ChainId == "AELF").Where(o => o.TransactionId == DefaultTransactionId)
-            .ToList(); 
+            .ToList();
         result.Count.ShouldBe(1);
-      
     }
-    
+
     [Fact]
     public async Task SaveSkipTransaction_Test()
     {
         BlockChainAppConstants.TransactionBeginHeight[ChainId] = 1;
-        await handleTransaction_Test("From", BlockChainAppConstants.TransactionAddressListMap[ChainId][0], 100,"UpdateTinyBlockInformation");
-        var queryable = await _transactionInfoRepository.GetQueryableAsync(); 
-        var result = queryable.Where(o => o.Metadata.ChainId == "AELF").Where(o => o.TransactionId == DefaultTransactionId)
-            .ToList(); 
+        await handleTransaction_Test("From", BlockChainAppConstants.TransactionAddressListMap[ChainId][0], 100,
+            "UpdateTinyBlockInformation");
+        var queryable = await _transactionInfoRepository.GetQueryableAsync();
+        var result = queryable.Where(o => o.Metadata.ChainId == "AELF")
+            .Where(o => o.TransactionId == DefaultTransactionId)
+            .ToList();
         result.Count.ShouldBe(1);
-        var queryable2 = await _blockTransactionInfoRepository.GetQueryableAsync(); 
+        var queryable2 = await _blockTransactionInfoRepository.GetQueryableAsync();
         var result2 = queryable2.Where(o => o.Metadata.ChainId == "AELF")
-            .ToList(); 
+            .ToList();
         result2.Count.ShouldBe(1);
     }
-    
+
     [Fact]
     public async Task SaveSkipTransactionTwice_Test()
     {
@@ -179,20 +182,20 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
         var transactionContext1 = GenerateTransactionContext(transaction1);
         transactionContext1.Block.BlockHeight = 100;
         transactionContext1.Block.BlockTime = DateTime.Today.AddDays(-2);
-       
+
         await _transactionProcessor.ProcessAsync(transaction1, transactionContext1);
         await SaveDataAsync();
-        
-       var queryable = await _transactionInfoRepository.GetQueryableAsync(); 
-       var result = queryable.Where(o => o.Metadata.ChainId == "AELF")
-            .ToList(); 
+
+        var queryable = await _transactionInfoRepository.GetQueryableAsync();
+        var result = queryable.Where(o => o.Metadata.ChainId == "AELF")
+            .ToList();
         result.Count.ShouldBe(2);
-       var  queryable2 = await _blockTransactionInfoRepository.GetQueryableAsync(); 
-       var  result2 = queryable2.Where(o => o.Metadata.ChainId == "AELF")
-            .ToList(); 
+        var queryable2 = await _blockTransactionInfoRepository.GetQueryableAsync();
+        var result2 = queryable2.Where(o => o.Metadata.ChainId == "AELF")
+            .ToList();
         result2.Count.ShouldBe(1);
     }
-    
+
     [Fact]
     public async Task DelSkipTransaction_Test()
     {
@@ -207,17 +210,18 @@ public partial class TransactionProcessorTests : TokenContractAppTestBase
         var transactionContext1 = GenerateTransactionContext(transaction1);
         transactionContext1.Block.BlockHeight = 100 + 500000;
         transactionContext1.Block.BlockTime = DateTime.Today.AddDays(-2);
-       
+
         await _transactionProcessor.ProcessAsync(transaction1, transactionContext1);
         await SaveDataAsync();
-        
-        var queryable = await _transactionInfoRepository.GetQueryableAsync(); 
-        var result = queryable.Where(o => o.Metadata.ChainId == "AELF").Where(o => o.TransactionId == DefaultTransactionId)
-            .ToList(); 
+
+        var queryable = await _transactionInfoRepository.GetQueryableAsync();
+        var result = queryable.Where(o => o.Metadata.ChainId == "AELF")
+            .Where(o => o.TransactionId == DefaultTransactionId)
+            .ToList();
         result.Count.ShouldBe(0);
-        var queryable2 = await _blockTransactionInfoRepository.GetQueryableAsync(); 
-        var  result2 = queryable2.Where(o => o.Metadata.ChainId == "AELF")
-            .ToList(); 
+        var queryable2 = await _blockTransactionInfoRepository.GetQueryableAsync();
+        var result2 = queryable2.Where(o => o.Metadata.ChainId == "AELF")
+            .ToList();
         result2.Count.ShouldBe(1);
        
     }

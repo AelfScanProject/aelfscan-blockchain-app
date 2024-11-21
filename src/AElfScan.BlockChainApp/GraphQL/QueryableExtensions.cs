@@ -49,6 +49,10 @@ public class QueryableExtensions
             case "TransactionId":
                 property = GetNestedPropertyExpression(parameter, "TransactionId");
                 break;
+            case "BlockTime":
+                property = GetNestedPropertyExpression(parameter, "Metadata.Block.BlockTime");
+                break;
+
             case "Index":
                 property = GetNestedPropertyExpression(parameter, "Index");
                 break;
