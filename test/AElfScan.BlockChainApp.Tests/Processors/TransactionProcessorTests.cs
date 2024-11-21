@@ -44,7 +44,12 @@ public partial class TransactionProcessorTests : BlockChainAppTestBase
             MethodName = "testMethod1",
             From = "testFrom1",
             To = "to1",
-            Index = 1
+            Index = 1,
+            ExtraProperties =new Dictionary<string, string>
+            {
+                {"TransactionFee", "{\"ELF\": 100}"},
+                {"ResourceFee", "{\"ELF\": 100}"}
+            }
         };
 
 
