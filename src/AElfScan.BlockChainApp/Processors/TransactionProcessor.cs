@@ -15,7 +15,7 @@ public class TransactionProcessor : TransactionProcessorBase
     private static readonly List<string> SkipMethodList = new()
     {
         "DonateResourceToken", "UpdateTinyBlockInformation", "UpdateValue", "NextRound", "ApproveMultiProposals",
-        "TestTransfer"
+        "TestTransfer","ProposeCrossChainIndexing","ReleaseCrossChainIndexingProposal"
     };
 
     protected IAeFinderLogger Logger => this.LazyServiceProvider.LazyGetService<IAeFinderLogger>();

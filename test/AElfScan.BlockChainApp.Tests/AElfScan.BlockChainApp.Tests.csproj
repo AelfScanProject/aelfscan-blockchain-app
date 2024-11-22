@@ -1,29 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>AElfScan.BlockChainApp</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\AElfScan.BlockChainApp\AElfScan.BlockChainApp.csproj" />
-      <ProjectReference Include="..\AElfScan.BlockChainApp.Orleans.TestBase\AElfScan.BlockChainApp.Orleans.TestBase.csproj" />
-      <ProjectReference Include="..\AElfScan.BlockChainApp.TestBase\AElfScan.BlockChainApp.TestBase.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="AeFinder.App" Version="0.0.5" />
-      <PackageReference Include="AutoMapper" Version="12.0.0" />
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
-      <PackageReference Include="coverlet.collector" Version="3.2.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Shouldly" Version="4.1.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="GraphQL\" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
+        <PackageReference Include="AeFinder.App.TestBase" Version="1.4.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+        <PackageReference Include="xunit" Version="2.4.2" />
+        <PackageReference Include="xunit.extensibility.execution" Version="2.4.2" />
+        <PackageReference Include="Shouldly" Version="4.0.3" />
+        <PackageReference Include="coverlet.collector" Version="3.2.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 </Project>

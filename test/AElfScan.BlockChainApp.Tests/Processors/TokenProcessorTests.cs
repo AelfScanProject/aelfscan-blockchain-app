@@ -3,7 +3,6 @@ using AElf.Contracts.MultiToken;
 using AElf.Types;
 using AElfScan.BlockChainApp.Entities;
 using AElfScan.BlockChainApp.GraphQL;
-using NSubstitute.Core;
 using Shouldly;
 using Xunit;
 using Query = AElfScan.BlockChainApp.GraphQL.Query;
@@ -27,7 +26,6 @@ public partial class TransactionProcessorTests
        };
        var logEventContext = GenerateLogEventContext(burned,DefaultTransactionId);
        await _burnedProcessor.ProcessAsync(logEventContext);
-       await SaveDataAsync();
        var queryable = await _transactionInfoRepository.GetQueryableAsync(); 
        var result = queryable.Where(o => o.Metadata.ChainId == "AELF").Where(o => o.TransactionId == DefaultTransactionId)
            .ToList(); 
@@ -49,7 +47,6 @@ public partial class TransactionProcessorTests
         };
         var logEventContext = GenerateLogEventContext(issued,DefaultTransactionId);
         await IssuedProcessor.ProcessAsync(logEventContext);
-        await SaveDataAsync();
         var queryable = await _transactionInfoRepository.GetQueryableAsync(); 
         var result = queryable.Where(o => o.Metadata.ChainId == "AELF").Where(o => o.TransactionId == DefaultTransactionId)
             .ToList(); 
@@ -71,7 +68,6 @@ public partial class TransactionProcessorTests
         };
         var logEventContext = GenerateLogEventContext(@event,DefaultTransactionId);
         await _rentalChargedProcessor.ProcessAsync(logEventContext);
-        await SaveDataAsync();
         var queryable = await _transactionInfoRepository.GetQueryableAsync(); 
         var result = queryable.Where(o => o.Metadata.ChainId == "AELF").Where(o => o.TransactionId == DefaultTransactionId)
             .ToList(); 
@@ -94,7 +90,6 @@ public partial class TransactionProcessorTests
         var logEventContext = GenerateLogEventContext(@event,DefaultTransactionId);
 
         await _resourceTokenClaimedProcessor.ProcessAsync(logEventContext);
-        await SaveDataAsync();
         var queryable = await _transactionInfoRepository.GetQueryableAsync(); 
         var result = queryable.Where(o => o.Metadata.ChainId == "AELF").Where(o => o.TransactionId == DefaultTransactionId)
             .ToList(); 
@@ -121,7 +116,6 @@ public partial class TransactionProcessorTests
         };
         var logEventContext = GenerateLogEventContext(crossChainReceived,DefaultTransactionId);
         await _crossChainReceivedProcessor.ProcessAsync(logEventContext);
-        await SaveDataAsync();
         var queryable = await _transactionInfoRepository.GetQueryableAsync(); 
         var result = queryable.Where(o => o.Metadata.ChainId == "AELF").Where(o => o.TransactionId == DefaultTransactionId)
             .ToList(); 
@@ -144,7 +138,6 @@ public partial class TransactionProcessorTests
         };
         var logEventContext = GenerateLogEventContext(transferred,DefaultTransactionId);
         await _transferredProcessor.ProcessAsync(logEventContext);
-        await SaveDataAsync();
         var queryable = await _transactionInfoRepository.GetQueryableAsync(); 
         var result = queryable.Where(o => o.Metadata.ChainId == "AELF").Where(o => o.TransactionId == DefaultTransactionId)
             .ToList(); 
@@ -170,6 +163,5 @@ public partial class TransactionProcessorTests
         transactionContext1.Block.BlockTime = DateTime.Today.AddDays(-2);
        
         await _transactionProcessor.ProcessAsync(transaction1, transactionContext1);
-        await SaveDataAsync();
     }
 }   

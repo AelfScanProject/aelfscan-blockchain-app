@@ -53,6 +53,9 @@ public class QueryableExtensions
                 property = GetNestedPropertyExpression(parameter, "Metadata.Block.BlockTime");
                 break;
 
+            case "Index":
+                property = GetNestedPropertyExpression(parameter, "Index");
+                break;
             default:
                 throw new Exception("Invalid order by field");
         }
